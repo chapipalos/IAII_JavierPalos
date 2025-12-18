@@ -12,40 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbdb4d6eb43fcbc42909018f1534c48c, type: 3}
   m_Name: CommandsSO
   m_EditorClassIdentifier: 
-  m_AllCommands:
-  - commandName: hlp
-    parameters: []
-    description: show all commands
-    commandEvent:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 11500000, guid: 9f19bb1497e9f0941b6b52f7929b86be, type: 3}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - commandName: cls
-    parameters: []
-    description: clear the console
-    commandEvent:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 11500000, guid: 9f19bb1497e9f0941b6b52f7929b86be, type: 3}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 1
+  allCommands:
+  - {fileID: 11400000, guid: 72bda6279a9f4564e80dd99f4acbb3fe, type: 2}
+  - {fileID: 11400000, guid: 8de667b1ea0864c4a8dbd292811c790c, type: 2}

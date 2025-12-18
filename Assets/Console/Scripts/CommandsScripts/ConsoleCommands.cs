@@ -1,10 +1,12 @@
 using TMPro;
 using UnityEngine;
 
-public static class ConsoleCommands
+public class ConsoleCommands : MonoBehaviour
 {
+    public TextMeshProUGUI consoleOutput;
 
-    public delegate void ClearConsole(TextMeshProUGUI consoleOutput);
-
-    public delegate void HelpCommand(TextMeshProUGUI consoleOutput, CommandsSOController allCommands);
+    public void ClearConsole()
+    {
+        consoleOutput.text = string.Empty;
+    }
 }

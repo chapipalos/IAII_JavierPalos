@@ -6,9 +6,18 @@
             "id": "0527f0b2-041d-4be7-8347-bebce373fbad",
             "actions": [
                 {
-                    "name": "Open",
+                    "name": "OpenConsole",
                     "type": "Button",
                     "id": "eb279147-236f-4378-b74d-c10a50f3c8fd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EnterCommand",
+                    "type": "Button",
+                    "id": "8b489281-84e8-4d3f-8b91-a32c1d64e737",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -23,7 +32,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Open",
+                    "action": "OpenConsole",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c9826181-bc9f-4a9e-a548-812f57f6dfee",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EnterCommand",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
