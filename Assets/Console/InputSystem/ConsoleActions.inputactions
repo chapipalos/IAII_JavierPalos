@@ -1,0 +1,34 @@
+{
+    "name": "ConsoleActions",
+    "maps": [
+        {
+            "name": "Console",
+            "id": "0527f0b2-041d-4be7-8347-bebce373fbad",
+            "actions": [
+                {
+                    "name": "Open",
+                    "type": "Button",
+                    "id": "eb279147-236f-4378-b74d-c10a50f3c8fd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ce8b8618-e826-443f-84c7-bcbf4c5a4a54",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Open",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
