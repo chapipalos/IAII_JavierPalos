@@ -47,7 +47,7 @@ public class GameCommands : MonoBehaviour
     {
         foreach (var command in commandsSO.allCommands)
         {
-            consoleOutput.text += $"{command}\n";
+            consoleOutput.text += $"<color=white>{command}</color>\n";
         }
     }
 

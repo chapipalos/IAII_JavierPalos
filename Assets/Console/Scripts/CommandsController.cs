@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TMPro;
-using TMPro.Examples;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +8,7 @@ public class CommandsController : MonoBehaviour
 {
     public TMP_InputField inputField;
     public TMP_InputField autocompleteField;
-    public TextMeshProUGUI consoleOutput;
+    public TMP_Text consoleOutput;
 
     private List<string> previousInput = new List<string>();
     private int previousInputIndex = -1;
@@ -37,7 +36,8 @@ public class CommandsController : MonoBehaviour
         {
             if (CommandRegistry.IsRegistered(inputField.text.Split(' ', System.StringSplitOptions.RemoveEmptyEntries)[0]))
             {
-                consoleOutput.text += $"\n> {inputField.text}\n";
+                consoleOutput.text += $"\n -<color=white><noparse>{inputField.text}</noparse></color>\n";
+
                 CommandRegistry.Execute(inputField.text);
                 previousInput.Add(inputField.text);
                 previousInputIndex = previousInput.Count;
@@ -46,7 +46,7 @@ public class CommandsController : MonoBehaviour
             }
             else
             {
-                consoleOutput.text += $"Command not found: {inputField.text}\n";
+                consoleOutput.text += $"<color=red>Command not found: <noparse>{inputField.text}</noparse></color>\n";
                 inputField.text = string.Empty;
                 inputField.ActivateInputField();
             }
