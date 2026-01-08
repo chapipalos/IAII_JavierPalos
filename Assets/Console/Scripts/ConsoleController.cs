@@ -13,10 +13,9 @@ public class ConsoleController : MonoBehaviour
 
     void Start()
     {
-        m_ToggleConsole = false;
-        ShowConsole(m_ToggleConsole);
         m_ToggleConsoleAction.action.Enable();
         m_ToggleConsoleAction.action.performed += ctx => ToggleConsole();
+        gameObject.SetActive(false);
     }
 
     private void ToggleConsole()
@@ -35,7 +34,6 @@ public class ConsoleController : MonoBehaviour
         else
         {
             m_InputField.DeactivateInputField();
-            m_InputField.text = string.Empty;
         }
     }
 }

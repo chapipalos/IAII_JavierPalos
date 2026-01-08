@@ -36,7 +36,7 @@ public class CommandsController : MonoBehaviour
         {
             if (CommandRegistry.IsRegistered(inputField.text.Split(' ', System.StringSplitOptions.RemoveEmptyEntries)[0]))
             {
-                consoleOutput.text += $"\n -<color=white><noparse>{inputField.text}</noparse></color>\n";
+                consoleOutput.text += $"\n -<color=green><noparse>{inputField.text}</noparse></color>\n";
 
                 CommandRegistry.Execute(inputField.text);
                 previousInput.Add(inputField.text);
@@ -82,6 +82,7 @@ public class CommandsController : MonoBehaviour
     private void Update()
     {
         AutoCompleteCommand();
+        CheckShortcuts();
     }
 
     private void ToggleAutoComplete()
@@ -97,9 +98,9 @@ public class CommandsController : MonoBehaviour
             string currentInput = inputField.text;
             foreach (var command in CommandRegistry.GetAllCommands())
             {
-                if (command.StartsWith(currentInput, System.StringComparison.OrdinalIgnoreCase))
+                if (command.commandName.StartsWith(currentInput, System.StringComparison.OrdinalIgnoreCase))
                 {
-                    autocompleteField.text = command;
+                    autocompleteField.text = command.commandName;
                     return;
                 }
             }
@@ -108,6 +109,38 @@ public class CommandsController : MonoBehaviour
         else
         {
             autocompleteField.text = string.Empty;
+        }
+    }
+
+    private void CheckShortcuts()
+    {
+        foreach (var command in CommandRegistry.GetAllCommands())
+        {
+            var keys = command.shortCuts;
+            if (keys == null || keys.Count == 0) continue;
+
+            bool allHeld = true;
+            bool anyPressedThisFrame = false;
+
+            for (int k = 0; k < keys.Count; k++)
+            {
+                var key = Keyboard.current[keys[k]];
+
+                if (!key.isPressed)
+                {
+                    allHeld = false;
+                    break;
+                }
+
+                if (key.wasPressedThisFrame)
+                    anyPressedThisFrame = true;
+            }
+
+            if (!allHeld || !anyPressedThisFrame) continue;
+
+            consoleOutput.text += $"\n -<color=green><noparse>{command.commandName}</noparse></color>\n";
+            previousInput.Add(command.commandName);
+            CommandRegistry.Execute(command.commandName);
         }
     }
 }

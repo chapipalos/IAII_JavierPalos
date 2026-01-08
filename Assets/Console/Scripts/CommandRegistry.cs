@@ -174,12 +174,12 @@ public static class CommandRegistry
         return false;
     }
 
-    public static List<string> GetAllCommands()
+    public static List<NewCommandSO> GetAllCommands()
     {
-        List<string> commands = new List<string>();
+        List<NewCommandSO> commands = new List<NewCommandSO>();
         foreach (var pair in registry)
         {
-            commands.Add(pair.Key.commandName);
+            commands.Add(pair.Key);
         }
         return commands;
     }

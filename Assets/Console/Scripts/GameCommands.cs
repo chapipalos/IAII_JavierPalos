@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameCommands : MonoBehaviour
 {
@@ -35,6 +36,9 @@ public class GameCommands : MonoBehaviour
             case "des":
                 CommandRegistry.RegisterParams<float>(command, t => DestroyObject(t));
                 break;
+            case "scn":
+                CommandRegistry.Register(command, LoadScene);
+                break;
         }
     }
 
@@ -53,6 +57,14 @@ public class GameCommands : MonoBehaviour
 
     void DestroyObject(float time)
     {
-        lifetimeController.StartLifetime(time);
+        if (lifetimeController != null)
+            lifetimeController.StartLifetime(time);
+    }
+
+    void LoadScene()
+    {
+        int sceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = (sceneIndex + 1) % SceneManager.sceneCountInBuildSettings;
+        SceneManager.LoadScene(nextSceneIndex);
     }
 }
