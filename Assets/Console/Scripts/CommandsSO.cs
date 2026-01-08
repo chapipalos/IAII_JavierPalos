@@ -13,10 +13,16 @@ public class NewCommandSO : ScriptableObject
 {
     public string commandName;
     public string description;
+    public List<string> parameters;
 
     public override string ToString()
     {
-        return $"{commandName}: {description}";
+        string res = $"{commandName} - {description}";
+        if(parameters != null && parameters.Count > 0)
+        {
+            res += $"\n\tParams: \t[{string.Join("]\n\t\t\t[", parameters)}]";
+        }
+        return res + "\n";
     }
 }
 

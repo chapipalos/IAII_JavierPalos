@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: Clear
+  m_Name: DestroyObject
   m_EditorClassIdentifier: Assembly-CSharp::NewCommandSO
-  commandName: clear
-  description: Clear the console
-  parameters: []
+  commandName: des
+  description: Destroy an object with LifetimeController
+  parameters:
+  - time to destroy

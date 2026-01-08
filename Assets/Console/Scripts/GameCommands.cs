@@ -1,10 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameCommands : MonoBehaviour
 {
+    public CommandsSO commandsSO;
+
+    // ----------------------------------------------------------
+    // ALL PARAMETERS AND VARIABLES FOR COMMANDS TO USE
+    // ----------------------------------------------------------
+
     public TMPro.TextMeshProUGUI consoleOutput;
 
-    public CommandsSO commandsSO;
+    public LifeimeController lifetimeController;
 
     void Awake()
     {
@@ -18,26 +25,34 @@ public class GameCommands : MonoBehaviour
     {
         switch (command.commandName.ToLower())
         {
-            case "cls":
+            case "clear":
                 CommandRegistry.Register(command, ClearConsole);
                 break;
 
             case "help":
                 CommandRegistry.Register(command, Help);
                 break;
+            case "des":
+                CommandRegistry.RegisterParams<float>(command, t => DestroyObject(t));
+                break;
         }
     }
 
-    void ClearConsole(string[] args)
+    void ClearConsole()
     {
         consoleOutput.text = string.Empty;
     }
 
-    void Help(string[] args)
+    void Help()
     {
         foreach (var command in commandsSO.allCommands)
         {
             consoleOutput.text += $"{command}\n";
         }
+    }
+
+    void DestroyObject(float time)
+    {
+        lifetimeController.StartLifetime(time);
     }
 }
