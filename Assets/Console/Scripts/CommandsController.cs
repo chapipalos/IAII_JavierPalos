@@ -1,15 +1,13 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 [RequireComponent(typeof(PlayerInput))]
 public class CommandsController : MonoBehaviour
 {
-    public TMP_InputField inputField;
-    public TMP_InputField autocompleteField;
-    public TMP_Text consoleOutput;
-
     private List<string> previousInput = new List<string>();
     private int previousInputIndex = -1;
 
@@ -32,23 +30,38 @@ public class CommandsController : MonoBehaviour
 
     private void ToggleActionConsole()
     {
-        if (!string.IsNullOrWhiteSpace(inputField.text))
+        if (!string.IsNullOrWhiteSpace(ConsoleSingleton.Instance.m_InputField.text))
         {
-            if (CommandRegistry.IsRegistered(inputField.text.Split(' ', System.StringSplitOptions.RemoveEmptyEntries)[0]))
+            var parts = ConsoleSingleton.Instance.m_InputField.text.Split(' ');
+            if (CommandRegistry.IsRegistered(parts[0]))
             {
-                consoleOutput.text += $"\n -<color=green><noparse>{inputField.text}</noparse></color>\n";
+                ConsoleSingleton.Instance.m_ConsoleOutput.text += $"\n -<color=green><noparse>{parts[0]}</noparse></color>";
 
-                CommandRegistry.Execute(inputField.text);
-                previousInput.Add(inputField.text);
-                previousInputIndex = previousInput.Count;
-                inputField.text = string.Empty;
-                inputField.ActivateInputField();
+                for (int i = 1; i < parts.Length; i++)
+                {
+                    ConsoleSingleton.Instance.m_ConsoleOutput.text += $"  <color=yellow><noparse>{parts[i]}</noparse></color>";
+                }
+
+                ConsoleSingleton.Instance.m_ConsoleOutput.text += $"\n";
+
+
+                if (CommandRegistry.Execute(ConsoleSingleton.Instance.m_InputField.text))
+                {
+                    previousInput.Add(ConsoleSingleton.Instance.m_InputField.text);
+                    previousInputIndex = previousInput.Count;
+                }
+                else
+                {
+                    ConsoleSingleton.Instance.m_ConsoleOutput.text += $"\n<color=red>{ConsoleSingleton.Instance.m_Error}</color>\n";
+                }
+                ConsoleSingleton.Instance.m_InputField.text = string.Empty;
+                ConsoleSingleton.Instance.m_InputField.ActivateInputField();
             }
             else
             {
-                consoleOutput.text += $"<color=red>Command not found: <noparse>{inputField.text}</noparse></color>\n";
-                inputField.text = string.Empty;
-                inputField.ActivateInputField();
+                ConsoleSingleton.Instance.m_ConsoleOutput.text += $"\n<color=red>Command not found: <noparse>{ConsoleSingleton.Instance.m_InputField.text}</noparse></color>\n";
+                ConsoleSingleton.Instance.m_InputField.text = string.Empty;
+                ConsoleSingleton.Instance.m_InputField.ActivateInputField();
             }
         }
     }
@@ -56,25 +69,25 @@ public class CommandsController : MonoBehaviour
     private void NavigateHistory(InputAction.CallbackContext context)
     {
         float value = context.ReadValue<float>();
-        if (value > 0) // Up
+        if (value > 0)
         {
             if (previousInputIndex > 0)
             {
                 previousInputIndex--;
-                inputField.text = previousInput[previousInputIndex];
+                ConsoleSingleton.Instance.m_InputField.text = previousInput[previousInputIndex];
             }
         }
-        else if (value < 0) // Down
+        else if (value < 0)
         {
             if (previousInputIndex < previousInput.Count - 1)
             {
                 previousInputIndex++;
-                inputField.text = previousInput[previousInputIndex];
+                ConsoleSingleton.Instance.m_InputField.text = previousInput[previousInputIndex];
             }
             else
             {
                 previousInputIndex = previousInput.Count;
-                inputField.text = string.Empty;
+                ConsoleSingleton.Instance.m_InputField.text = string.Empty;
             }
         }
     }
@@ -87,28 +100,28 @@ public class CommandsController : MonoBehaviour
 
     private void ToggleAutoComplete()
     {
-        inputField.text = autocompleteField.text;
-        inputField.caretPosition = inputField.text.Length;
+        ConsoleSingleton.Instance.m_InputField.text = ConsoleSingleton.Instance.m_AutocompleteField.text;
+        ConsoleSingleton.Instance.m_InputField.caretPosition = ConsoleSingleton.Instance.m_InputField.text.Length;
     }
 
     private void AutoCompleteCommand()
     {
-        if (inputField.text.Length > 1)
+        if (ConsoleSingleton.Instance.m_InputField.text.Length > 1)
         {
-            string currentInput = inputField.text;
+            string currentInput = ConsoleSingleton.Instance.m_InputField.text;
             foreach (var command in CommandRegistry.GetAllCommands())
             {
-                if (command.commandName.StartsWith(currentInput, System.StringComparison.OrdinalIgnoreCase))
+                if (command.commandName.StartsWith(currentInput))
                 {
-                    autocompleteField.text = command.commandName;
+                    ConsoleSingleton.Instance.m_AutocompleteField.text = command.commandName;
                     return;
                 }
             }
-            autocompleteField.text = string.Empty;
+            ConsoleSingleton.Instance.m_AutocompleteField.text = string.Empty;
         }
         else
         {
-            autocompleteField.text = string.Empty;
+            ConsoleSingleton.Instance.m_AutocompleteField.text = string.Empty;
         }
     }
 
@@ -138,7 +151,7 @@ public class CommandsController : MonoBehaviour
 
             if (!allHeld || !anyPressedThisFrame) continue;
 
-            consoleOutput.text += $"\n -<color=green><noparse>{command.commandName}</noparse></color>\n";
+            ConsoleSingleton.Instance.m_ConsoleOutput.text += $"\n -<color=green><noparse>{command.commandName}</noparse></color>\n";
             previousInput.Add(command.commandName);
             CommandRegistry.Execute(command.commandName);
         }

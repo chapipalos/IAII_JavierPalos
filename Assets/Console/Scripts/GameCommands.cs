@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,16 +6,9 @@ public class GameCommands : MonoBehaviour
 {
     public CommandsSO commandsSO;
 
-    // ----------------------------------------------------------
-    // ALL PARAMETERS AND VARIABLES FOR COMMANDS TO USE
-    // ----------------------------------------------------------
-
-    public TMPro.TextMeshProUGUI consoleOutput;
-
-    public LifeimeController lifetimeController;
-
     void Awake()
     {
+        CommandRegistry.Clear();
         foreach (var command in commandsSO.allCommands)
         {
             RegisterCommand(command);
@@ -27,38 +20,40 @@ public class GameCommands : MonoBehaviour
         switch (command.commandName.ToLower())
         {
             case "clear":
-                CommandRegistry.Register(command, ClearConsole);
+                CommandRegistry.Register(command, (Action)ClearConsole);
                 break;
 
             case "help":
-                CommandRegistry.Register(command, Help);
+                CommandRegistry.Register(command, (Action)Help);
                 break;
             case "des":
-                CommandRegistry.RegisterParams<float>(command, t => DestroyObject(t));
+                CommandRegistry.Register(command, (Action<float>)DestroyObject);
                 break;
             case "scn":
-                CommandRegistry.Register(command, LoadScene);
+                CommandRegistry.Register(command, (Action)LoadScene);
                 break;
         }
     }
 
     void ClearConsole()
     {
-        consoleOutput.text = string.Empty;
+        ConsoleSingleton.Instance.m_ConsoleOutput.text = string.Empty;
     }
 
     void Help()
     {
+        ConsoleSingleton.Instance.m_ConsoleOutput.text += "\n";
         foreach (var command in commandsSO.allCommands)
         {
-            consoleOutput.text += $"<color=white>{command}</color>\n";
+            ConsoleSingleton.Instance.m_ConsoleOutput.text += $"<color=white>{command}</color>\n";
         }
     }
 
     void DestroyObject(float time)
     {
-        if (lifetimeController != null)
-            lifetimeController.StartLifetime(time);
+        LifeimeController lifeimeController = FindFirstObjectByType<LifeimeController>();
+        if (lifeimeController != null)
+            lifeimeController.StartLifetime(time);
     }
 
     void LoadScene()

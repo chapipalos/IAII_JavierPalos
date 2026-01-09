@@ -1,161 +1,150 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 using UnityEngine;
 
 public static class CommandRegistry
 {
     private static readonly Dictionary<NewCommandSO, Delegate> registry = new();
 
-    public static void Register(NewCommandSO command, Action action)
-        => registry[command] = action;
+    public static void Register(NewCommandSO command, Delegate del)
+        => registry[command] = del;
 
-    public static void RegisterParams<T>(NewCommandSO command, Action<T> action)
-        => registry[command] = action;
-
-    public static void RegisterParams<T1, T2>(NewCommandSO command, Action<T1, T2> action)
-        => registry[command] = action;
+    public static void Clear() => registry.Clear();
 
     public static bool Execute(string input)
     {
-        var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var parts = input.Split(' ');
         if (parts.Length == 0) return false;
+
+        var cmdName = parts[0];
 
         foreach (var pair in registry)
         {
-            if (!pair.Key.commandName.Equals(parts[0], StringComparison.OrdinalIgnoreCase))
+            if (!pair.Key.commandName.Equals(cmdName))
                 continue;
 
             var del = pair.Value;
+            var paramInfos = del.Method.GetParameters();
+            var expected = paramInfos.Length;
+            var provided = parts.Length - 1;
 
-            // 0 params
-            if (del is Action a0)
+            if (provided != expected)
             {
-                if (parts.Length != 1)
-                {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 0)");
-                    return false;
-                }
-                a0();
-                return true;
+                ConsoleSingleton.Instance.m_Error =
+                    $"Incorrect number of parameters for command: {cmdName} (expected {expected})";
+                return false;
             }
 
-            // 1 param
-            if (del is Action<float> af)
+            var args = new object[expected];
+
+            for (int i = 0; i < expected; i++)
             {
-                if (parts.Length != 2)
+                var raw = parts[i + 1];
+                var targetType = paramInfos[i].ParameterType;
+
+                if (!TryConvert(raw, targetType, out var converted))
                 {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 1)");
+                    ConsoleSingleton.Instance.m_Error =
+                        $"Parameter conversion failed for command: {cmdName} (arg{i}='{raw}' expected {targetType.Name})";
                     return false;
                 }
-                if (!TryParse(parts[1], out float v))
-                {
-                    Debug.LogWarning($"Parameter conversion failed for command: {parts[0]} (arg0='{parts[1]}' expected float)");
-                    return false;
-                }
-                af(v);
-                return true;
+
+                args[i] = converted;
             }
 
-            if (del is Action<int> ai)
+            try
             {
-                if (parts.Length != 2)
-                {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 1)");
-                    return false;
-                }
-                if (!TryParse(parts[1], out int v))
-                {
-                    Debug.LogWarning($"Parameter conversion failed for command: {parts[0]} (arg0='{parts[1]}' expected int)");
-                    return false;
-                }
-                ai(v);
+                del.DynamicInvoke(args);
                 return true;
             }
-
-            if (del is Action<bool> ab)
+            catch (TargetInvocationException tie)
             {
-                if (parts.Length != 2)
-                {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 1)");
-                    return false;
-                }
-                if (!TryParse(parts[1], out bool v))
-                {
-                    Debug.LogWarning($"Parameter conversion failed for command: {parts[0]} (arg0='{parts[1]}' expected bool)");
-                    return false;
-                }
-                ab(v);
-                return true;
+                var msg = tie.InnerException != null ? tie.InnerException.Message : tie.Message;
+                ConsoleSingleton.Instance.m_Error = $"Command '{cmdName}' threw: {msg}";
+                return false;
             }
-
-            if (del is Action<string> aS)
+            catch (Exception e)
             {
-                if (parts.Length != 2)
-                {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 1)");
-                    return false;
-                }
-                aS(parts[1]);
-                return true;
+                ConsoleSingleton.Instance.m_Error = $"Failed to execute command '{cmdName}': {e.Message}";
+                return false;
             }
-
-            // 2 params (ejemplo: float,int)
-            if (del is Action<float, int> aFI)
-            {
-                if (parts.Length != 3)
-                {
-                    Debug.LogWarning($"Incorrect number of parameters for command: {parts[0]} (expected 2)");
-                    return false;
-                }
-                if (!TryParse(parts[1], out float f) || !TryParse(parts[2], out int n))
-                {
-                    Debug.LogWarning($"Parameter conversion failed for command: {parts[0]} (expected float int)");
-                    return false;
-                }
-                aFI(f, n);
-                return true;
-            }
-
-            Debug.LogWarning($"Command registered but unsupported signature: {parts[0]} ({del.GetType().Name})");
-            return false;
         }
 
-        Debug.LogWarning($"Command not found: {parts[0]}");
+        ConsoleSingleton.Instance.m_Error = $"Command not found: {cmdName}";
         return false;
     }
 
-    private static bool TryParse<T>(string s, out T value)
+    private static bool TryConvert(string s, Type targetType, out object value)
     {
-        value = default;
+        value = null;
 
-        if (typeof(T) == typeof(float))
+        // strings directos
+        if (targetType == typeof(string))
         {
-            var ok = float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var v);
-            value = (T)(object)v;
-            return ok;
-        }
-        if (typeof(T) == typeof(int))
-        {
-            var ok = int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var v);
-            value = (T)(object)v;
-            return ok;
-        }
-        if (typeof(T) == typeof(bool))
-        {
-            var ok = bool.TryParse(s, out var v);
-            value = (T)(object)v;
-            return ok;
-        }
-        if (typeof(T) == typeof(string))
-        {
-            value = (T)(object)s;
+            value = s;
             return true;
+        }
+
+        // enums
+        if (targetType.IsEnum)
+        {
+            if (Enum.TryParse(targetType, s, ignoreCase: true, out var enumVal))
+            {
+                value = enumVal;
+                return true;
+            }
+            return false;
+        }
+
+        // bool
+        if (targetType == typeof(bool))
+        {
+            if (bool.TryParse(s, out var b))
+            {
+                value = b;
+                return true;
+            }
+            return false;
+        }
+
+        // números con InvariantCulture (float, int, double, etc.)
+        if (targetType == typeof(float))
+        {
+            if (float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var f))
+            {
+                value = f;
+                return true;
+            }
+            return false;
+        }
+
+        if (targetType == typeof(int))
+        {
+            if (int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i))
+            {
+                value = i;
+                return true;
+            }
+            return false;
         }
 
         try
         {
-            value = (T)Convert.ChangeType(s, typeof(T), CultureInfo.InvariantCulture);
+            var converter = TypeDescriptor.GetConverter(targetType);
+            if (converter != null && converter.CanConvertFrom(typeof(string)))
+            {
+                value = converter.ConvertFrom(null, CultureInfo.InvariantCulture, s);
+                return true;
+            }
+        }
+        catch {}
+
+        try
+        {
+            value = Convert.ChangeType(s, targetType, CultureInfo.InvariantCulture);
             return true;
         }
         catch
@@ -168,7 +157,7 @@ public static class CommandRegistry
     {
         foreach (var pair in registry)
         {
-            if (pair.Key.commandName.Equals(commandName, StringComparison.OrdinalIgnoreCase))
+            if (pair.Key.commandName.Equals(commandName))
                 return true;
         }
         return false;
@@ -176,11 +165,9 @@ public static class CommandRegistry
 
     public static List<NewCommandSO> GetAllCommands()
     {
-        List<NewCommandSO> commands = new List<NewCommandSO>();
+        var commands = new List<NewCommandSO>();
         foreach (var pair in registry)
-        {
             commands.Add(pair.Key);
-        }
         return commands;
     }
 }
