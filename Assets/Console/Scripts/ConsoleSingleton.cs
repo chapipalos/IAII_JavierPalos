@@ -4,9 +4,7 @@ using UnityEngine.InputSystem;
 
 public class ConsoleSingleton : MonoBehaviour
 {
-    public static ConsoleSingleton Instance { get; private set; }
-
-    public LifeimeController m_LifetimeController;
+    public static ConsoleSingleton m_Instance { get; private set; }
 
     public InputActionReference m_ToggleConsoleAction;
 
@@ -16,46 +14,46 @@ public class ConsoleSingleton : MonoBehaviour
 
     public string m_Error;
 
-    public bool m_ToggleConsole;
+    private bool m_ToggleConsole;
 
-    public GameObject console;
+    public GameObject m_Console;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (m_Instance != null && m_Instance != this)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            Instance = this;
+            m_Instance = this;
             DontDestroyOnLoad(this.gameObject);
         }
     }
 
     void Start()
     {
-        Instance.m_ToggleConsoleAction.action.Enable();
-        Instance.m_ToggleConsoleAction.action.performed += ctx => ToggleConsole();
-        Instance.console.SetActive(false);
+        m_Instance.m_ToggleConsoleAction.action.Enable();
+        m_Instance.m_ToggleConsoleAction.action.performed += ctx => ToggleConsole();
+        m_Instance.m_Console.SetActive(false);
     }
 
     public void ToggleConsole()
     {
-        Instance.m_ToggleConsole = !Instance.m_ToggleConsole;
-        Instance.console.SetActive(Instance.m_ToggleConsole);
-        Instance.ShowConsole();
+        m_Instance.m_ToggleConsole = !m_Instance.m_ToggleConsole;
+        m_Instance.m_Console.SetActive(m_Instance.m_ToggleConsole);
+        m_Instance.ShowConsole();
     }
 
     public void ShowConsole()
     {
-        if (Instance.m_ToggleConsole)
+        if (m_Instance.m_ToggleConsole)
         {
-            Instance.m_InputField.ActivateInputField();
+            m_Instance.m_InputField.ActivateInputField();
         }
         else
         {
-            Instance.m_InputField.DeactivateInputField();
+            m_Instance.m_InputField.DeactivateInputField();
         }
     }
 }

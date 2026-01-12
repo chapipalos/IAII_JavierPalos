@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class GameCommands : MonoBehaviour
 {
-    public CommandsSO commandsSO;
+    public CommandsSO m_CommandsSO;
 
     void Awake()
     {
         CommandRegistry.Clear();
-        foreach (var command in commandsSO.allCommands)
+        foreach (var command in m_CommandsSO.m_AllCommands)
         {
             RegisterCommand(command);
         }
@@ -17,7 +17,7 @@ public class GameCommands : MonoBehaviour
 
     void RegisterCommand(NewCommandSO command)
     {
-        switch (command.commandName.ToLower())
+        switch (command.m_CommandName.ToLower())
         {
             case "clear":
                 CommandRegistry.Register(command, (Action)ClearConsole);
@@ -32,28 +32,31 @@ public class GameCommands : MonoBehaviour
             case "scn":
                 CommandRegistry.Register(command, (Action)LoadScene);
                 break;
+            case "create":
+                CommandRegistry.Register(command, (Action<int, float, float>)CreateSpheres);
+                break;
         }
     }
 
     void ClearConsole()
     {
-        ConsoleSingleton.Instance.m_ConsoleOutput.text = string.Empty;
+        ConsoleSingleton.m_Instance.m_ConsoleOutput.text = string.Empty;
     }
 
     void Help()
     {
-        ConsoleSingleton.Instance.m_ConsoleOutput.text += "\n";
-        foreach (var command in commandsSO.allCommands)
+        ConsoleSingleton.m_Instance.m_ConsoleOutput.text += "\n";
+        foreach (var command in m_CommandsSO.m_AllCommands)
         {
-            ConsoleSingleton.Instance.m_ConsoleOutput.text += $"<color=white>{command}</color>\n";
+            ConsoleSingleton.m_Instance.m_ConsoleOutput.text += $"<color=white>{command}</color>\n";
         }
     }
 
     void DestroyObject(float time)
     {
-        LifeimeController lifeimeController = FindFirstObjectByType<LifeimeController>();
-        if (lifeimeController != null)
-            lifeimeController.StartLifetime(time);
+        TestComandsController testCommands = FindFirstObjectByType<TestComandsController>();
+        if (testCommands != null)
+            testCommands.StartLifetime(time);
     }
 
     void LoadScene()
@@ -61,5 +64,12 @@ public class GameCommands : MonoBehaviour
         int sceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = (sceneIndex + 1) % SceneManager.sceneCountInBuildSettings;
         SceneManager.LoadScene(nextSceneIndex);
+    }
+
+    void CreateSpheres(int quantity, float minSpeed, float maxSpeed)
+    {
+        TestComandsController testCommands = FindFirstObjectByType<TestComandsController>();
+        if (testCommands != null)
+            testCommands.SpawnTestObject(quantity, minSpeed, maxSpeed);
     }
 }

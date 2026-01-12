@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Clear
   m_EditorClassIdentifier: Assembly-CSharp::NewCommandSO
-  commandName: clear
-  description: Clear the console
-  parameters: []
+  m_CommandName: clear
+  m_Description: Clears the console
+  m_Parameters: []
+  m_ShortCuts: 

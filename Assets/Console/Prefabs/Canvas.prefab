@@ -116,8 +116,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ToggleConsoleAction: {fileID: 3743362105359926734, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
+  m_ConsoleOutput: {fileID: 4912391264830917136}
   m_InputField: {fileID: 2468654729529472250}
-  console: {fileID: 2572008702318614148}
+  m_AutocompleteField: {fileID: 750734110276035229}
+  m_Error: 
+  m_Console: {fileID: 2572008702318614148}
 --- !u!1 &1351294747997270173
 GameObject:
   m_ObjectHideFlags: 0
@@ -1190,8 +1193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5435e291b1d3cc64c9c23b928624586e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  commandsSO: {fileID: 11400000, guid: ecdfd9f5e94ba0244bc33a62f70f26a1, type: 2}
-  consoleOutput: {fileID: 4912391264830917136}
+  m_CommandsSO: {fileID: 11400000, guid: ecdfd9f5e94ba0244bc33a62f70f26a1, type: 2}
 --- !u!114 &7687955061857076534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1204,12 +1206,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00639b1c092266c458593166543a49cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputField: {fileID: 2468654729529472250}
-  autocompleteField: {fileID: 750734110276035229}
-  consoleOutput: {fileID: 4912391264830917136}
-  toggleConsoleAction: {fileID: 5435194010006041224, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
-  historialAction: {fileID: 1225020586894393180, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
-  autocompleteAction: {fileID: -362879933063604280, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
+  m_ToggleConsoleAction: {fileID: 5435194010006041224, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
+  m_HistorialAction: {fileID: 1225020586894393180, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
+  m_AutocompleteAction: {fileID: -362879933063604280, guid: 08e0f6eca516e974e9884a7c319be577, type: 3}
 --- !u!1 &7387525829037576972
 GameObject:
   m_ObjectHideFlags: 0

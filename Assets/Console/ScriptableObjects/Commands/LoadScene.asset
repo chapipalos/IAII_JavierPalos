@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: Help
+  m_Name: LoadScene
   m_EditorClassIdentifier: Assembly-CSharp::NewCommandSO
-  commandName: help
-  parameters: []
-  description: Show all commands avaliable
+  m_CommandName: scn
+  m_Description: Load the next scene builded
+  m_Parameters: []
+  m_ShortCuts: 370000001a000000

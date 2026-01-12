@@ -7,12 +7,12 @@ using UnityEngine;
 
 public static class CommandRegistry
 {
-    private static readonly Dictionary<NewCommandSO, Delegate> registry = new();
+    private static readonly Dictionary<NewCommandSO, Delegate> m_Registry = new();
 
     public static void Register(NewCommandSO command, Delegate del)
-        => registry[command] = del;
+        => m_Registry[command] = del;
 
-    public static void Clear() => registry.Clear();
+    public static void Clear() => m_Registry.Clear();
 
     public static bool Execute(string input)
     {
@@ -21,9 +21,9 @@ public static class CommandRegistry
 
         var cmdName = parts[0];
 
-        foreach (var pair in registry)
+        foreach (var pair in m_Registry)
         {
-            if (!pair.Key.commandName.Equals(cmdName))
+            if (!pair.Key.m_CommandName.Equals(cmdName))
                 continue;
 
             var del = pair.Value;
@@ -33,7 +33,7 @@ public static class CommandRegistry
 
             if (provided != expected)
             {
-                ConsoleSingleton.Instance.m_Error =
+                ConsoleSingleton.m_Instance.m_Error =
                     $"Incorrect number of parameters for command: {cmdName} (expected {expected})";
                 return false;
             }
@@ -47,7 +47,7 @@ public static class CommandRegistry
 
                 if (!TryConvert(raw, targetType, out var converted))
                 {
-                    ConsoleSingleton.Instance.m_Error =
+                    ConsoleSingleton.m_Instance.m_Error =
                         $"Parameter conversion failed for command: {cmdName} (arg{i}='{raw}' expected {targetType.Name})";
                     return false;
                 }
@@ -63,17 +63,17 @@ public static class CommandRegistry
             catch (TargetInvocationException tie)
             {
                 var msg = tie.InnerException != null ? tie.InnerException.Message : tie.Message;
-                ConsoleSingleton.Instance.m_Error = $"Command '{cmdName}' threw: {msg}";
+                ConsoleSingleton.m_Instance.m_Error = $"Command '{cmdName}' threw: {msg}";
                 return false;
             }
             catch (Exception e)
             {
-                ConsoleSingleton.Instance.m_Error = $"Failed to execute command '{cmdName}': {e.Message}";
+                ConsoleSingleton.m_Instance.m_Error = $"Failed to execute command '{cmdName}': {e.Message}";
                 return false;
             }
         }
 
-        ConsoleSingleton.Instance.m_Error = $"Command not found: {cmdName}";
+        ConsoleSingleton.m_Instance.m_Error = $"Command not found: {cmdName}";
         return false;
     }
 
@@ -155,9 +155,9 @@ public static class CommandRegistry
 
     public static bool IsRegistered(string commandName)
     {
-        foreach (var pair in registry)
+        foreach (var pair in m_Registry)
         {
-            if (pair.Key.commandName.Equals(commandName))
+            if (pair.Key.m_CommandName.Equals(commandName))
                 return true;
         }
         return false;
@@ -166,8 +166,22 @@ public static class CommandRegistry
     public static List<NewCommandSO> GetAllCommands()
     {
         var commands = new List<NewCommandSO>();
-        foreach (var pair in registry)
+        foreach (var pair in m_Registry)
             commands.Add(pair.Key);
         return commands;
+    }
+
+    public static bool HasParameters(string commandName)
+    {
+        foreach (var pair in m_Registry)
+        {
+            if (pair.Key.m_CommandName.Equals(commandName))
+            {
+                var del = pair.Value;
+                var paramInfos = del.Method.GetParameters();
+                return paramInfos.Length > 0;
+            }
+        }
+        return false;
     }
 }
