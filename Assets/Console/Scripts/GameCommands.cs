@@ -35,6 +35,9 @@ public class GameCommands : MonoBehaviour
             case "create":
                 CommandRegistry.Register(command, (Action<int, float, float>)CreateSpheres);
                 break;
+            case "setname":
+                CommandRegistry.Register(command, (Action<string>)SetNewName);
+                break;
         }
     }
 
@@ -71,5 +74,12 @@ public class GameCommands : MonoBehaviour
         TestComandsController testCommands = FindFirstObjectByType<TestComandsController>();
         if (testCommands != null)
             testCommands.SpawnTestObject(quantity, minSpeed, maxSpeed);
+    }
+
+    void SetNewName(string newName)
+    {
+        TestComandsController testCommands = FindFirstObjectByType<TestComandsController>();
+        if (testCommands != null)
+            testCommands.SetName(newName);
     }
 }
